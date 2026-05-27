@@ -588,7 +588,7 @@ export default function App() {
           {barW > 0 && <Animated.View style={[s.tabPill, { width: TAB_W - 8, left: pillLeft }]} />}
           {(['sensores', 'eventos', 'alertas', 'status'] as Aba[]).map(t => (
             <TouchableOpacity key={t} style={[s.tab, { flex: 1 }]} onPress={() => switchTab(t)} activeOpacity={0.7}>
-              <Text style={s.tabIcon}>{t === 'sensores' ? '◈' : t === 'eventos' ? '◎' : t === 'alertas' ? '⚡' : '◉'}</Text>
+              <Text style={s.tabIcon}>{t === 'sensores' ? '◈' : t === 'eventos' ? '◎' : t === 'alertas' ? '◆' : '◉'}</Text>
               <Text style={[s.tabLabel, aba === t && s.tabLabelOn]} numberOfLines={1}>
                 {t === 'sensores' ? 'Sensores' : t === 'eventos' ? 'Eventos' : t === 'alertas' ? 'Alertas' : 'Status'}
               </Text>
