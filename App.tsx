@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
-  Modal, TextInput, Alert, Animated, Dimensions, SafeAreaView,
+  Modal, TextInput, Alert, Animated, Dimensions, SafeAreaView, Platform,
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { Sensor } from './src/types/sensor';
@@ -382,23 +382,32 @@ export default function App() {
   const [ne, setNe] = useState({ descricao: '', sistema: '', dataHora: '', tipo: '', status: 'PENDENTE' });
   const [na, setNa] = useState({ titulo: '', descricao: '', nivel: 'MEDIO', dataHora: '', resolvido: false });
 
-  useEffect(() => { load(); }, [aba]);
+  useEffect(() => { loadAll(); }, []);
+  useEffect(() => {
+    if (aba === 'status') loadAll();
+    else loadTab();
+  }, [aba]);
 
-  async function load() {
+  async function loadAll() {
+    setLoading(true); setErro(null);
+    try {
+      const [s, e, a, st] = await Promise.all([listarSensores(), listarEventos(), listarAlertas(), buscarStatus()]);
+      setSensores(s); setEventos(e); setAlertas(a); setMissaoStatus(st);
+    } catch { setErro('Falha de conexão — verifique o backend em localhost:8080'); }
+    finally { setLoading(false); }
+  }
+
+  async function loadTab() {
     setLoading(true); setErro(null);
     try {
       if (aba === 'sensores') setSensores(await listarSensores());
       else if (aba === 'eventos') setEventos(await listarEventos());
       else if (aba === 'alertas') setAlertas(await listarAlertas());
-      else if (aba === 'status') {
-        setStatusLoading(true);
-        const [s, e, a, st] = await Promise.all([listarSensores(), listarEventos(), listarAlertas(), buscarStatus()]);
-        setSensores(s); setEventos(e); setAlertas(a); setMissaoStatus(st);
-        setStatusLoading(false);
-      }
     } catch { setErro('Falha de conexão — verifique o backend em localhost:8080'); }
     finally { setLoading(false); }
   }
+
+  async function load() { await loadAll(); }
 
   function switchTab(t: Aba) {
     setAba(t);
@@ -574,7 +583,7 @@ export default function App() {
           {(['sensores', 'eventos', 'alertas', 'status'] as Aba[]).map(t => (
             <TouchableOpacity key={t} style={[s.tab, { width: TAB_W }]} onPress={() => switchTab(t)} activeOpacity={0.7}>
               <Text style={s.tabIcon}>{t === 'sensores' ? '◈' : t === 'eventos' ? '◎' : t === 'alertas' ? '⚡' : '◉'}</Text>
-              <Text style={[s.tabLabel, aba === t && s.tabLabelOn]}>
+              <Text style={[s.tabLabel, aba === t && s.tabLabelOn]} numberOfLines={1}>
                 {t === 'sensores' ? 'Sensores' : t === 'eventos' ? 'Eventos' : t === 'alertas' ? 'Alertas' : 'Status'}
               </Text>
             </TouchableOpacity>
