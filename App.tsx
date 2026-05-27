@@ -139,6 +139,12 @@ function BigRing({ pct, color, size = 140 }: { pct: number; color: string; size?
   );
 }
 
+function glow(color: string, intensity = 0.3): object {
+  return Platform.OS === 'web'
+    ? ({ boxShadow: `0 0 18px ${color}55, 0 0 6px ${color}33` } as any)
+    : { shadowColor: color, shadowOpacity: intensity, shadowRadius: 10, shadowOffset: { width: 0, height: 0 }, elevation: 6 };
+}
+
 function Divider() {
   return <View style={{ height: 1, backgroundColor: T.border, marginVertical: 12 }} />;
 }
@@ -227,7 +233,7 @@ function SensorCard({ s, onPress }: { s: Sensor; onPress: () => void }) {
   const pct = Math.min(Math.abs(s.leituraAtual ?? 0) % 101, 100);
   return (
     <TouchableOpacity onPress={onPress} activeOpacity={0.75}>
-      <View style={[card.wrap, { borderColor: online ? T.green + '30' : T.border }]}>
+      <View style={[card.wrap, { borderColor: c + '55' }, glow(c, 0.2)]}>
         <View style={card.row}>
           <Dot color={c} pulse={online} />
           <View style={{ flex: 1, marginLeft: 8 }}>
@@ -262,7 +268,7 @@ function EventoCard({ e, last, onPress }: { e: EventoOperacional; last: boolean;
           <Dot color={c} size={6} />
           {!last && <View style={{ flex: 1, width: 1, backgroundColor: T.border, marginTop: 6 }} />}
         </View>
-        <View style={[card.wrap, { flex: 1, marginBottom: last ? 0 : 10 }]}>
+        <View style={[card.wrap, { flex: 1, marginBottom: last ? 0 : 10, borderColor: c + '44' }, glow(c, 0.15)]}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
             <View style={{ flex: 1, marginRight: 10 }}>
               <Label>{e.tipo?.toUpperCase() || 'EVENTO'}</Label>
@@ -297,8 +303,7 @@ function AlertaCard({ a, onPress }: { a: AlertaCritico; onPress: () => void }) {
   const idx = levels.indexOf(a.nivel?.toUpperCase());
   return (
     <TouchableOpacity onPress={onPress} activeOpacity={0.75}>
-      <Animated.View style={[card.wrap, { borderColor: isCrit ? c : T.border, borderWidth: 1, opacity: 1 },
-        isCrit && { borderColor: c, shadowColor: c, shadowOpacity: 0.3, shadowRadius: 10 }]}>
+      <Animated.View style={[card.wrap, { borderColor: c + '55' }, glow(c, isCrit ? 0.4 : 0.2)]}>
         {isCrit && <Animated.View style={{ position: 'absolute', inset: 0, borderRadius: 10, borderWidth: 1, borderColor: c, opacity: borderOpacity }} />}
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1 }}>
@@ -332,7 +337,7 @@ function AlertaCard({ a, onPress }: { a: AlertaCritico; onPress: () => void }) {
 }
 
 const card = StyleSheet.create({
-  wrap: { backgroundColor: T.card, borderRadius: 10, padding: 14, marginBottom: 10, borderWidth: 1, borderColor: T.border, overflow: 'hidden' },
+  wrap: { backgroundColor: T.card, borderRadius: 10, padding: 14, marginBottom: 10, borderWidth: 1, borderColor: T.border },
   row: { flexDirection: 'row', alignItems: 'center' },
   title: { fontSize: 14, fontWeight: '700', color: T.text },
   sub: { fontSize: 10, color: T.textSub, fontFamily: T.mono, marginTop: 1 },
