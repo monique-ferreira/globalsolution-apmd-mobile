@@ -491,7 +491,8 @@ export default function App() {
     );
   }
 
-  const TAB_W = (width - 40) / 4;
+  const [barW, setBarW] = useState(width - 40);
+  const TAB_W = (barW - 8) / 4;
   const pillLeft = tabX.interpolate({ inputRange: [0, 1, 2, 3], outputRange: [4, TAB_W + 4, TAB_W * 2 + 4, TAB_W * 3 + 4] });
   const ativos = sensores.filter(s => s.ativo).length;
   const criticos = alertas.filter(a => !a.resolvido && a.nivel?.toUpperCase() === 'CRITICO').length;
@@ -578,10 +579,10 @@ export default function App() {
 
       {/* ── FLOATING TAB BAR ── */}
       <View style={s.tabBarWrap}>
-        <View style={s.tabBar}>
-          <Animated.View style={[s.tabPill, { width: TAB_W - 8, left: pillLeft }]} />
+        <View style={s.tabBar} onLayout={e => setBarW(e.nativeEvent.layout.width)}>
+          {barW > 0 && <Animated.View style={[s.tabPill, { width: TAB_W - 8, left: pillLeft }]} />}
           {(['sensores', 'eventos', 'alertas', 'status'] as Aba[]).map(t => (
-            <TouchableOpacity key={t} style={[s.tab, { width: TAB_W }]} onPress={() => switchTab(t)} activeOpacity={0.7}>
+            <TouchableOpacity key={t} style={[s.tab, { flex: 1 }]} onPress={() => switchTab(t)} activeOpacity={0.7}>
               <Text style={s.tabIcon}>{t === 'sensores' ? '◈' : t === 'eventos' ? '◎' : t === 'alertas' ? '⚡' : '◉'}</Text>
               <Text style={[s.tabLabel, aba === t && s.tabLabelOn]} numberOfLines={1}>
                 {t === 'sensores' ? 'Sensores' : t === 'eventos' ? 'Eventos' : t === 'alertas' ? 'Alertas' : 'Status'}
