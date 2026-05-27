@@ -546,7 +546,7 @@ export default function App() {
       </SafeAreaView>
 
       {/* ── CONTENT ── */}
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 14, paddingBottom: 120 }}>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 14, paddingBottom: 120 }} showsVerticalScrollIndicator={false}>
         {loading && (
           <View style={{ alignItems: 'center', paddingTop: 60, gap: 10 }}>
             <LoadingDots />
